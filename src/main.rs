@@ -1,22 +1,24 @@
 use std::io::{self, BufRead, Write};
-use drs_primitives::*;
 
 fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
     if args.len()!=4 {
         println!("Usage: {} {} start destination", args[0], args[1]);
         return;
     }
-    let def : trenitalia::TrainStation = trenitalia::TrainStation{id: String::from(""),name: String::from(""),region_id: 0,position: Coord{lat:0.0,lon:0.0}};
-    let s1 = treni.find_train_station(&args[2]).unwrap_or(&def);
-    if s1.name=="" {
-    	println!("could not find station {}", args[2]);
-    	return;
-    }
-    let s2 = treni.find_train_station(&args[3]).unwrap_or(&def);
-    if s2.name=="" {
-    	println!("could not find station {}", args[3]);
-    	return;
-    }
+    let s1 = match treni.find_train_station(&args[2]) {
+        None => {
+            println!("could not find station {}", args[2]);
+            return;
+        }
+        Some(x) => x
+    };
+    let s2 = match treni.find_train_station(&args[3]) {
+        None => {
+            println!("could not find station {}", args[3]);
+            return;
+        }
+        Some(x) => x
+    };
     let trips = treni.find_trips(s1, s2, &chrono::Local::now());
     println!("Solutions for {} -> {}",s1.name,s2.name);
     for trip in &trips {

@@ -8,5 +8,4 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4"
-drs_primitives = { git = "https://github.com/eutampieri/drs-primitives" }
 trenitalia = {git="https://github.com/eutampieri/trenitalia.git"}
