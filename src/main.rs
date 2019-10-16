@@ -5,10 +5,20 @@ fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
         println!("Usage: {} {} start destination", args[0], args[1]);
         return;
     }
-    let s1 = treni.find_train_station(&args[2])
-        .or_else(||{println!("could not find station {}", args[2]);std::process::exit(1);}).unwrap();
-    let s2 = treni.find_train_station(&args[3])
-        .or_else(||{println!("could not find station {}", args[2]);std::process::exit(1);}).unwrap();
+    let s1 = match treni.find_train_station(&args[2]) {
+        None => {
+            println!("could not find station {}", args[2]);
+            return;
+        }
+        Some(x) => x
+    };
+    let s2 = match treni.find_train_station(&args[3]) {
+        None => {
+            println!("could not find station {}", args[3]);
+            return;
+        }
+        Some(x) => x
+    };
     let trips = treni.find_trips(s1, s2, &chrono::Local::now());
     println!("Solutions for {} -> {}",s1.name,s2.name);
     for trip in &trips {
