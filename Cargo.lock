@@ -1217,7 +1217,7 @@ dependencies = [
 [[package]]
 name = "trenitalia"
 version = "0.1.0"
-source = "git+https://github.com/eutampieri/trenitalia.git#6a8852165b393af392bbe738b29eaf74d49efdec"
+source = "git+https://github.com/eutampieri/trenitalia.git#38a575021f7693c0b439a24f79593105047cc844"
 dependencies = [
  "chrono 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "drs_primitives 0.1.0 (git+https://github.com/eutampieri/drs-primitives)",
