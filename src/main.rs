@@ -1,5 +1,7 @@
 use std::io::{self, BufRead, Write};
 
+const TRAIN_TYPE_STR: [&str;10] = ["R","RV","IC","FR","FA","FB","ICN","EN","EC","?"];
+
 fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
     if args.len()!=4 {
         println!("Usage: {} {} start destination", args[0], args[1]);
@@ -23,8 +25,14 @@ fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
     println!("Solutions for {} -> {}",s1.name,s2.name);
     for trip in &trips {
         print!("\n");
-        for train in trip {
-            print!("{} {} --{:?}-{}--> {} {}\t",train.departure.0.name, train.departure.1.format("%H:%M"), train.train_type, train.train_number, train.arrival.0.name, train.arrival.1.format("%H:%M") );
+        for i in 0..trip.len() {
+            if i==0 {
+                print!("{} ",trip[i].departure.0.name);
+            }
+            print!("{} =={}{}==>> {} {}", trip[i].departure.1.format("%H:%M"), if trip[i].train_type as i32 as usize >= TRAIN_TYPE_STR.len() {"?"} else {TRAIN_TYPE_STR[trip[i].train_type as i32 as usize]}, trip[i].train_number, trip[i].arrival.1.format("%H:%M"), trip[i].arrival.0.name);
+			if i!=trip.len()-1 {
+				print!(" ");
+			}
         }
         print!("\n");
 	}
