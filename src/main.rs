@@ -22,14 +22,14 @@ fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
         Some(x) => x
     };
     let trips = treni.find_trips(s1, s2, &chrono::Local::now());
-    println!("Solutions for {} -> {}",s1.name,s2.name);
+    println!("Solutions for {} -> {}",s1.get_name(),s2.get_name());
     for trip in &trips {
         print!("\n");
         for i in 0..trip.len() {
             if i==0 {
-                print!("{} ",trip[i].departure.0.name);
+                print!("{} ",trip[i].departure.0.get_name());
             }
-            print!("{} =={}{}==>> {} {}", trip[i].departure.1.format("%H:%M"), if trip[i].train_type as i32 as usize >= TRAIN_TYPE_STR.len() {"?"} else {TRAIN_TYPE_STR[trip[i].train_type as i32 as usize]}, trip[i].train_number, trip[i].arrival.1.format("%H:%M"), trip[i].arrival.0.name);
+            print!("{} =={}{}==>> {} {}", trip[i].departure.1.format("%H:%M"), if trip[i].train_type as i32 as usize >= TRAIN_TYPE_STR.len() {"?"} else {TRAIN_TYPE_STR[trip[i].train_type as i32 as usize]}, trip[i].train_number, trip[i].arrival.1.format("%H:%M"), trip[i].arrival.0.get_name());
 			if i!=trip.len()-1 {
 				print!(" ");
 			}
