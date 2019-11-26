@@ -1,5 +1,54 @@
 use std::io::{self, BufRead, Write};
 
+fn tinfo(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
+    let calling_at: &trenitalia::TrainStation;
+    if args.len() == 3 {
+        calling_at = treni.get_train_station("ILA").unwrap();
+    } else if args.len() == 4 {
+        if let Some(x) = treni.find_train_station(&args[3]) {
+            calling_at = x;
+        } else {
+            println!("Error: The station was not found.");
+            return;
+        }
+    } else {
+        println!("Usage: {} {} train_number [calling at]", args[0], args[1]);
+        return;
+    }
+    if let Ok(tinfo) = treni.train_info_calling_at(args[2].parse::<u32>().unwrap(), calling_at) {
+        println!("=== Train {} ===", args[2]);
+        println!("- Delay: {} minutes", tinfo.current_delay);
+        let mut current_stop: Option<&trenitalia::DetailedTrainTripStop> = None;
+        let mut next_stop: Option<&trenitalia::DetailedTrainTripStop> = None;
+        for i in 0..tinfo.stops.len() {
+            if tinfo.stops[i].station.id == tinfo.current_station.id {
+                current_stop = Some(&tinfo.stops[i]);
+                if i < tinfo.stops.len()-1 {
+                    next_stop = Some(&tinfo.stops[i+1]);
+                } else {
+                    next_stop = None;
+                }
+            }
+        }
+        if tinfo.is_at_station {
+            println!("- Status: Arrived in {} at {}", tinfo.current_station.get_name(), current_stop.unwrap().arrival.map(|x| x.format("%H:%M").to_string()).unwrap_or("?".to_string()));
+        } else {
+            println!("- Status: Departed from {} at {}", tinfo.current_station.get_name(), current_stop.unwrap().departure.map(|x| x.format("%H:%M").to_string()).unwrap_or("?".to_string()));
+        }
+        if let Some(ns) = next_stop {
+            println!(
+                "- Next stop: {}\n\t- Expected arrival: {}\n\t- Expected platform: {}",
+                ns.station.get_name(),
+                ns.expected_arrival.map(|x| x.format("%H:%M").to_string()).unwrap_or("?".to_string()),
+                ns.platform
+            );
+        }
+    } else {
+        println!("Usage: {} {} train_number calling_at\nError: multiple trains with the same number were found, please specify a station where the train calls at.", args[0], args[1]);
+        return;
+    }
+}
+
 fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia, fare: bool) {
     if args.len()!=4 {
         println!("Usage: {} {} start destination", args[0], args[1]);
@@ -67,6 +116,8 @@ fn interactive(args : &Vec<String>, treni: &trenitalia::Trenitalia){
 fn help(args : &Vec<String>){
     println!("Usage: {}",args[0]);
     println!("\ttft [start] [destination]\tfind train from start to destination");
+    println!("\ttftf [start] [destination]\tfind train from start to destination, display fares");
+    println!("\ttinfo [train number] <[calling at]>\tfind train info");
     println!("\tinteractive\tenter interactive mode");
     println!("\texit\texit from interactive mode");
     println!("\thelp\tshow this message");
@@ -79,9 +130,10 @@ fn exec(args : &Vec<String>, treni: &trenitalia::Trenitalia, allow_interactive: 
     }
     if args[1]=="tft" {
         tft(&args,&treni, false);
-    }
-    else if args[1]=="tftf" {
+    } else if args[1]=="tftf" {
         tft(&args,&treni, true);
+    } else if args[1]=="tinfo" {
+        tinfo(&args,&treni);
     } else if args[1]=="interactive" && allow_interactive {
         interactive(&args, &treni);
     } else if args[1]=="help"{
