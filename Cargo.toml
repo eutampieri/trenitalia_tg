@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4"
-trenitalia = {git="https://github.com/eutampieri/trenitalia.git"}
+trenitalia = "0.3"

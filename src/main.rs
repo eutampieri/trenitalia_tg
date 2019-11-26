@@ -1,8 +1,6 @@
 use std::io::{self, BufRead, Write};
 
-const TRAIN_TYPE_STR: [&str;10] = ["R","RV","IC","FR","FA","FB","ICN","EN","EC","?"];
-
-fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
+fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia, fare: bool) {
     if args.len()!=4 {
         println!("Usage: {} {} start destination", args[0], args[1]);
         return;
@@ -24,15 +22,22 @@ fn tft(args: &Vec<String>, treni: &trenitalia::Trenitalia) {
     let trips = treni.find_trips(s1, s2, &chrono::Local::now());
     println!("Solutions for {} -> {}",s1.get_name(),s2.get_name());
     for trip in &trips {
+        let mut total_fare = 0.0;
         print!("\n");
         for i in 0..trip.len() {
             if i==0 {
                 print!("{} ",trip[i].departure.0.get_name());
             }
-            print!("{} =={}{}==>> {} {}", trip[i].departure.1.format("%H:%M"), if trip[i].train_type as i32 as usize >= TRAIN_TYPE_STR.len() {"?"} else {TRAIN_TYPE_STR[trip[i].train_type as i32 as usize]}, trip[i].train_number, trip[i].arrival.1.format("%H:%M"), trip[i].arrival.0.get_name());
+            print!("{} =={}==>> {} {}", trip[i].departure.1.format("%H:%M"), trip[i].train_number.to_string(), trip[i].arrival.1.format("%H:%M"), trip[i].arrival.0.get_name());
 			if i!=trip.len()-1 {
 				print!(" ");
-			}
+            }
+            if fare {
+                total_fare = total_fare + trip[i].get_fare().unwrap_or(0.0);
+            }
+        }
+        if fare {
+            print!(" {} €", total_fare);
         }
         print!("\n");
 	}
@@ -73,7 +78,10 @@ fn exec(args : &Vec<String>, treni: &trenitalia::Trenitalia, allow_interactive: 
         return;
     }
     if args[1]=="tft" {
-        tft(&args,&treni);
+        tft(&args,&treni, false);
+    }
+    else if args[1]=="tftf" {
+        tft(&args,&treni, true);
     } else if args[1]=="interactive" && allow_interactive {
         interactive(&args, &treni);
     } else if args[1]=="help"{
