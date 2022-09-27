@@ -11,5 +11,5 @@ chrono = "0.4"
 trenitalia = "0.3"
 serde = "1.0"
 serde_json = "1.0"
-reqwest = "0.9"
-percent-encoding = "2.1"
+ureq = {version="2.5", features=["json"]}
+percent-encoding = "2.2"
